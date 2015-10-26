@@ -35,41 +35,30 @@
     return obj && obj.hasOwnProperty && obj instanceof jQuery;
   };
 
-  var getForm = function (form) {
-    if ($.is$(form)) {
-      form = form.get();
+  var get$form = function (form) {
+    var $form = null;
+    var _form = $(form).get(0);
+
+    if (_form && _form.tagName.toLowerCase() == 'form') {
+      $form = _form;
     }
 
-    if (!Array.isArray(form)) {
-      form = [form];
-    }
+    return $form;
+  };
 
-    if (form[0] && form[0].tagName.toLowerCase() == 'form') {
-      form = form[0];
+  var get$controls = function (nodes) {
+    var $controls = null;
+    var $form = get$form(nodes);
+
+    if ($form) {
+      $controls = $(controlsSelectors, $form);
     } else {
-      form = null;
+      $controls = $(nodes).filter(controlsSelectors);
     }
 
-    return form;
+    return $controls;
   };
 
-  var getControls = function (nodes) {
-    if ($.is$(nodes)) {
-      nodes = nodes.get();
-    }
-
-    if (!Array.isArray(nodes)) {
-      nodes = [nodes];
-    }
-
-    if (nodes[0] && nodes[0].tagName.toLowerCase() == 'form') {
-      nodes = nodes[0].elements;
-    }
-
-    nodes = $(nodes).filter(controlsSelectors);
-
-    return nodes;
-  };
 
   // serializes form fields
   // @param elements HTML elements or HTMLForm
@@ -95,7 +84,7 @@
     //Object store each radio and set if it's empty or not
     var radio_store = Object.create(null);
 
-    nodes = getControls(nodes);
+    nodes = get$controls(nodes).get();
 
     var node, key, val, selectOptions, isSelectedOptions, option, allowedEmpty, hasValue;
     for (var i = 0; i < nodes.length; ++i) {
